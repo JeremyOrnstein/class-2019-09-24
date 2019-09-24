@@ -6,13 +6,33 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 library(tidyverse)
 library(readxl)
 library(janitor)
 ```
 
 ```{r}
-read_xlsx("class-enrollment_summary_by_term_9.24.19.xlsx")
+school <- read_xlsx("class_enrollment_summary_by_term_9.24.19.xlsx", skip=3) %>%
+  clean_names()
+
+school %>% 
+  filter(course_department=="Government") %>% arrange(desc(u_grad + grad)) %>% select(course_name) %>% head()
+```
+The largest course enrollment in Gov class 
+
+```{r}
+school %>% 
+ group_by(course_department) %>%
+  summarize(avg=mean(u_grad))
+```
+reprex
+
+```{r}
+school_new <- read_xlsx("class_enrollment_summary_by_term_9.17.19.xlsx", skip=3)%>%
+  clean_names()
+
+school %>% left_join(school_new, by = "course_id", suffix=c("_old", "_new")) %>% 
+  mutate(u_grad_diff=(u_grad_old-u_grad_new)) %>% arrange(desc(u_grad_diff)) %>% 
 ```
 
